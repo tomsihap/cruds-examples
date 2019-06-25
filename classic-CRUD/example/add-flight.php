@@ -57,14 +57,29 @@ if (!empty($_POST)) {
         throw new Exception('La durée de vol n\'a pas été renseignée.');
     }
 
+    if (isset($_FILES['photo']) and $_FILES['photo']['error'] == 0) {
+        // Testons si le fichier n'est pas trop gros
+        if ($_FILES['photo']['size'] <= 10000000) {
+            // Testons si l'extension est autorisée
+            $infosfichier = pathinfo($_FILES['photo']['name']);
+            $extension_upload = $infosfichier['extension'];
+            $extensions_autorisees = array('jpg', 'jpeg', 'gif', 'png');
+            if (in_array($extension_upload, $extensions_autorisees)) {
+                // On peut valider le fichier et le stocker définitivement
+                move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . basename($_FILES['photo']['name']));
+                echo "L'envoi a bien été effectué !";
+            }
+        }
+    }
+
 
     /**
      * 2. Si aucune exception n'a été levée...
      * Enregistrement en base de données
      */
 
-    $request = 'INSERT INTO flight (departure_code, arrival_code, company, departure_date, duration)
-                VALUES (:departure_code, :arrival_code, :company, :departure_date, :duration)';
+    $request = 'INSERT INTO flight (departure_code, arrival_code, company, departure_date, duration, photo)
+                VALUES (:departure_code, :arrival_code, :company, :departure_date, :duration, :photo)';
 
     $response = $bdd->prepare($request);
 
@@ -74,6 +89,7 @@ if (!empty($_POST)) {
         'company'           => $_POST['company'],
         'departure_date'    => $_POST['departure_date'] . " " . $_POST['departure_time'], // date + " " + time
         'duration'          => $_POST['duration'],
+        'photo'             => basename($_FILES['photo']['name']),
     ]);
 }
 
@@ -98,10 +114,10 @@ if (!empty($_POST)) {
         <div class="row mt-3">
             <div class="col-12">
 
-                <a href="index.php">< Retour à la page d'accueil</a>
-                <h1>Ajouter un nouveau vol</h1>
+                <a href="index.php">
+                    < Retour à la page d'accueil</a> <h1>Ajouter un nouveau vol</h1>
 
-                        <form action="add-flight.php" method="post" class="form">
+                        <form action="add-flight.php" method="post" class="form" enctype="multipart/form-data">
 
                             <div class="form-group">
                                 <label for="#formDepartureCode">Code IATA de l'aéroport de départ</label>
@@ -131,6 +147,11 @@ if (!empty($_POST)) {
                             <div class="form-group">
                                 <label for="#formDepartureCode">Durée du vol en minutes</label>
                                 <input type="number" name="duration">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="#formDepartureCode">Image du vol</label>
+                                <input type="file" name="photo">
                             </div>
 
                             <button class="btn btn-success float-right" type="submit">Créer le vol</button>

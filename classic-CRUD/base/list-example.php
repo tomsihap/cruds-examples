@@ -6,7 +6,7 @@ $request = 'SELECT * FROM exampleTable';
 
 $response = $bdd->query($request);
 
-$flights = $response->fetchAll();
+$examples = $response->fetchAll();
 
 ?>
 
@@ -37,18 +37,20 @@ $flights = $response->fetchAll();
                             <th>Field2</th>
                             <th>Field3</th>
                             <th>Field4</th>
+                            <th>Field5 Photo</th>
                         </tr>
                     </thead>
 
 
-                    <?php foreach ($flights as $flight) : ?>
+                    <?php foreach ($examples as $flight) : ?>
 
                         <tr>
-                            <td><?= $flight['id'] ?></td>
-                            <td><?= $flight['field1'] ?></td>
-                            <td><?= $flight['field2'] ?></td>
-                            <td><?= $flight['field3'] ?></td>
-                            <td><?= $flight['field4'] ?></td>
+                            <td><?= $example['id'] ?></td>
+                            <td><?= $example['field1'] ?></td>
+                            <td><?= $example['field2'] ?></td>
+                            <td><?= $example['field3'] ?></td>
+                            <td><?= $example['field4'] ?></td>
+                            <td><img src="uploads/<?= $example['photo'] ?>" height="100"></td>
                         </tr>
 
                     <?php endforeach; ?>

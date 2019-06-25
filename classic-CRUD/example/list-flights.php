@@ -27,36 +27,37 @@ $flights = $response->fetchAll();
     <div class="container">
         <div class="row mt-3 div col-12">
 
-            <a href="index.php">< Retour à la page d'accueil</a>
+            <a href="index.php">
+                < Retour à la page d'accueil</a> <table class="table">
 
-            <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Aéroport de départ</th>
+                            <th>Aéroport d'arrivée</th>
+                            <th>Compagnie</th>
+                            <th>Date de départ</th>
+                            <th>Durée du trajet</th>
+                            <th>Photo</th>
+                        </tr>
+                    </thead>
 
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Aéroport de départ</th>
-                        <th>Aéroport d'arrivée</th>
-                        <th>Compagnie</th>
-                        <th>Date de départ</th>
-                        <th>Durée du trajet</th>
-                    </tr>
-                </thead>
 
+                    <?php foreach ($flights as $flight) : ?>
 
-                <?php foreach ($flights as $flight) : ?>
+                        <tr>
+                            <td><?= $flight['id'] ?></td>
+                            <td><?= $flight['departure_code'] ?></td>
+                            <td><?= $flight['arrival_code'] ?></td>
+                            <td><?= $flight['company'] ?></td>
+                            <td><?= $flight['departure_date'] ?></td>
+                            <td><?= $flight['duration'] ?></td>
+                            <td><img src="uploads/<?= $flight['photo'] ?>" height="100"></td>
+                        </tr>
 
-                    <tr>
-                        <td><?= $flight['id'] ?></td>
-                        <td><?= $flight['departure_code'] ?></td>
-                        <td><?= $flight['arrival_code'] ?></td>
-                        <td><?= $flight['company'] ?></td>
-                        <td><?= $flight['departure_date'] ?></td>
-                        <td><?= $flight['duration'] ?></td>
-                    </tr>
+                    <?php endforeach; ?>
 
-                <?php endforeach; ?>
-
-            </table>
+                    </table>
 
         </div>
     </div>

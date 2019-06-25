@@ -29,14 +29,29 @@ if (!empty($_POST)) {
         throw new Exception('La date a un format incorrect.');
     }
 
+    if (isset($_FILES['photo']) and $_FILES['photo']['error'] == 0) {
+        // Testons si le fichier n'est pas trop gros
+        if ($_FILES['photo']['size'] <= 10000000) {
+            // Testons si l'extension est autorisée
+            $infosfichier = pathinfo($_FILES['photo']['name']);
+            $extension_upload = $infosfichier['extension'];
+            $extensions_autorisees = array('jpg', 'jpeg', 'gif', 'png');
+            if (in_array($extension_upload, $extensions_autorisees)) {
+                // On peut valider le fichier et le stocker définitivement
+                move_uploaded_file($_FILES['photo']['tmp_name'], 'uploads/' . basename($_FILES['photo']['name']));
+                echo "L'envoi a bien été effectué !";
+            }
+        }
+    }
+
 
     /**
      * 2. Si aucune exception n'a été levée...
      * Enregistrement en base de données
      */
 
-    $request = 'INSERT INTO exampleTable (field1, field2, field3, field4)
-                VALUES (:field1, :field2, :field3, :field4)';
+    $request = 'INSERT INTO exampleTable (field1, field2, field3, field4, :photo)
+                VALUES (:field1, :field2, :field3, :field4, :photo)';
 
     $response = $bdd->prepare($request);
 
@@ -44,7 +59,8 @@ if (!empty($_POST)) {
         'field1'        => $_POST['field1'],
         'field2'        => $_POST['field2'],
         'field3'        => $_POST['field3'],
-        'field4'        => $_POST['field4']
+        'field4'        => $_POST['field4'],
+        'photo'        => $_POST['photo']
     ]);
 }
 
@@ -72,7 +88,8 @@ if (!empty($_POST)) {
                 <a href="index.php">
                     < Retour à la page d'accueil</a> <h1>Ajouter un nouvel élément</h1>
 
-                        <form action="add-example.php" method="post" class="form">
+                        <!-- Attention, le enctype="multipart/form-data" est obligatoire pour envoyer des fichiers -->
+                        <form action="add-example.php" method="post" class="form" enctype="multipart/form-data">
 
                             <div class="form-group">
                                 <label for="#formField1">Field1</label>
@@ -92,6 +109,11 @@ if (!empty($_POST)) {
                             <div class="form-group">
                                 <label for="#formField1">field4</label>
                                 <input type="text" name="field4">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="#formField1">Photo</label>
+                                <input type="file" name="photo">
                             </div>
 
                             <button class="btn btn-success float-right" type="submit">Créer l'élément</button>
