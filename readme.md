@@ -9,3 +9,6 @@
 > **NOTE SUR LA BDD** Si vous créez une base de données, **N'OUBLIEZ PAS** la clé primaire sur vos tables ! Il suffit simplement de créer un champ `id` `INT` en cochant `AI`. **ATTENTION** à ne pas mettre d'espaces dans les noms des champs.
 
 > **NOTE SUR LES NOMS DE FICHIERS** Les projets de base contiendront des fichiers nommés `example*.php`. Par exemple : `src/model/Example.php` ou bien `src/controller/ExampleController.php`. **Ce sont bien des exemples !** Ne les utilisez pas comme tels, soit vous les renommer, soit vous créez des fichiers tout neufs en vous en inspirant !
+
+
+> **NOTE SUR LA BDD EXAMPLE** Vous pouvez exécuter dans PHPMyAdmin `flightswf3.sql` pour prendre la base de données pour les exemples.
