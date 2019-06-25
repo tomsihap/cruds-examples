@@ -28,7 +28,10 @@ $flights = $response->fetchAll();
         <div class="row mt-3 div col-12">
 
             <a href="index.php">
-                < Retour à la page d'accueil</a> <table class="table">
+                < Retour à la page d'accueil</a>
+
+
+                <table class="table">
 
                     <thead>
                         <tr>
