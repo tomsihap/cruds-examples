@@ -8,6 +8,10 @@ function url($route) {
     return BASE_URL . '/'. $route;
 }
 
+function uploads_url($img) {
+    return BASE_URL . '/public/uploads/' . $img;
+}
+
 function img_url($img) {
     return BASE_URL . '/public/assets/img' . $img;
 }
