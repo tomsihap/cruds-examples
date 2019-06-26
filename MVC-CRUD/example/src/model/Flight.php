@@ -83,10 +83,10 @@ class Flight extends Db {
                 $extension_upload = $infosfichier['extension'];
                 $extensions_autorisees = array('jpg', 'jpeg', 'gif', 'png');
                 if (in_array($extension_upload, $extensions_autorisees)) {
-                    // On peut valider le fichier et le stocker définitivement
-                    move_uploaded_file($photo['tmp_name'],  './public/uploads/' . $photo['name'] );
 
-                    $this->photo = $photo['name'];
+                    // On stocke le NOM de la photo (pas la photo elle même, on le fera après le save afin de
+                    // modifier le nom de la photo)
+                    $this->photo = $photo;
                     return $this;
                 }
             }
@@ -131,18 +131,76 @@ class Flight extends Db {
 
     public function save()
     {
+
+        // On ne met pas la photo tout de suite
         $data = [
             "departure_code"    => $this->getDepartureCode(),
             "arrival_code"      => $this->getArrivalCode(),
             "company"           => $this->getCompany(),
             "departure_date"    => $this->getDepartureDate(),
             "duration"          => $this->getDuration(),
-            "photo"             => $this->getPhoto(),
         ];
         //if ($this->id > 0) return $this->update();
         $nouvelId = Db::dbCreate(self::TABLE_NAME, $data);
         $this->setId($nouvelId);
+
+        // Une fois l'élément enregistré, on renomme la photo et on update l'élément.
+        // On utilise une nouvelle méthode pour séparer le code proprement
+
+        $this->savePhoto();
+        $this->createMiniature();
+
         return $this;
+    }
+
+    private function savePhoto() {
+
+        $photo = $this->getPhoto();
+
+        $extension = pathinfo($photo['name'])['extension'];
+
+        $newName = "flight_" . $this->getId();
+
+        $newNameWithExtension = $newName . "." . $extension;
+
+        move_uploaded_file($photo['tmp_name'], './public/uploads/'  .  $newNameWithExtension);
+
+        $data = [
+            'id' => $this->getId(),
+            'photo' => $newNameWithExtension
+        ];
+
+        Db::dbUpdate( self::TABLE_NAME, $data );
+
+        return $this;
+    }
+
+    private function createMiniature() {
+        /**
+         * Gestion de la miniature :
+         * Je traite mes variables afin de remplir les arguments de ma fonction createMinature,
+         * qui crééera par exemple l'image suivante : "logement_38_300x300.png"
+         */
+
+
+        $photo = $this->getPhoto();
+
+
+        // 1. On récupère le nom de l'ancienne image
+        $extension = pathinfo($photo['name'])['extension'];
+        $oldName = "flight_" . $this->getId();
+        $oldNameWithExtension = $oldName . "." . $extension;
+
+
+        $titreAncienneImage = $oldNameWithExtension;                    // Le nom de l'image de départ AVEC extension
+        $extension = $extension;                                        // L'extension de départ
+        $dossierEnregistrement = './public/uploads';                    // Le dossier de stockage des images, sans "/" !!!
+        $titreNouvelleImage = $titreAncienneImage . '_300x300.' . $extension;      // Le nom de la nouvelle image AVEC extension
+        $resultMiniature = createMiniature($titreAncienneImage, $extension, $dossierEnregistrement, $titreNouvelleImage);
+        if (!$resultMiniature) {
+            echo "Il y a eu un problème lors de la création de la miniature.";
+            return;
+        }
     }
 
     public static function findAll() {
